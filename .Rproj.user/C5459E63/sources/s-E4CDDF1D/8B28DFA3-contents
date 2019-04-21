@@ -1,6 +1,7 @@
 ---
-title: "practicaGuiada"
+title: "Práctica Guiada"
 output: pdf_document
+author: "Carlos Manuel Sequí Sánchez"
 ---
 
 
@@ -18,15 +19,17 @@ Dividimos los datos en entrenamiento y test. Dejamos para ello el último año p
 ```{r}
 NTest = 12 # cantidad de datos a usar como test
 NPred = 12 # cantidad de predicciones que queremos realizar 
-serie.ts = ts(serie, frequency = 12) # creamos el objeto serie temporal suponiendo una estacionalidad de 12 meses
+serie.ts = ts(serie, frequency = 12) # creamos el objeto serie temporal
+                                     # suponiendo una estacionalidad de 12 meses
 plot(decompose(serie.ts))
 ```
 
-Observamos aquí: \\
--observed: los valores de la serie\\
--trend: la tendencia calculada mediante filtros\\
--seasonal: estacionalidad en la que cada 12 instantes de tiempo se repite la serie\\
--random: lo que queda de la serie una vez eliminadas tendencia y estacionalidad\\
+Observamos aquí:
+
+-observed: los valores de la serie  
+-trend: la tendencia calculada mediante filtros  
+-seasonal: estacionalidad en la que cada 12 instantes de tiempo se repite la serie  
+-random: lo que queda de la serie una vez eliminadas tendencia y estacionalidad  
 
 Como observamos en random, la varianza es alta, lo que puede dar problemas en un futuro para la estacionariedad,
 ya que como sabemos, una serie con estacionariedad no varía en media ni en varianza. Para ello, a la serie inicial
@@ -65,8 +68,8 @@ lines(tiempoTs, serieTs, col="red")
 
 
 A continuación prodecemos a modelar la tendencia. 
-Parece ser que la tendencia es lineal y creciente, por lo que tendrá la forma de:\\
-serie = parametroA*tiempo + parametroB.\\
+Parece ser que la tendencia es lineal y creciente, por lo que tendrá la forma de:  
+serie = parametroA*tiempo + parametroB.  
 Con la funcion lm calculamos esos dos parametros para modelar dicha tendencia.
 ```{r}
 parametros.H1 = lm(serieTr ~tiempoTr)
@@ -75,8 +78,10 @@ parametros.H1
 
 Intercept es el termino independiente (parametroB) y el otro es el que multiplica al tiempo para poder calcular la serie (parametroA). Para modelar la tendencia usamos la fórmula descrita antes:
 ```{r}
-tendEstimadaTr = parametros.H1$coefficients[1] + tiempoTr*parametros.H1$coefficients[2] # tendencia en entrenamiento
-tendEstimadaTs = parametros.H1$coefficients[1] + tiempoTs*parametros.H1$coefficients[2] # tendencia en test
+# tendencia en entrenamiento
+tendEstimadaTr = parametros.H1$coefficients[1] + tiempoTr*parametros.H1$coefficients[2]
+# tendencia en test
+tendEstimadaTs = parametros.H1$coefficients[1] + tiempoTs*parametros.H1$coefficients[2] 
 ```
 
 Comprobamos de forma visual si la tendencia se ajusta al modelo que tenemos de la serie temporal.
@@ -88,7 +93,7 @@ lines(tiempoTs, tendEstimadaTs, col = "green")
 ```
 
 
-Validamos a continuación de forma estadística que el modelo lineal creado sea correcto. Para ellos hemos de comprobar que los errores a lo largo del rango de la serie tanto en entrenamiento como en test son normales, es decir, que se distribuyen mediante distribución normal a lo largo de todo el tiempo.\\
+Validamos a continuación de forma estadística que el modelo lineal creado sea correcto. Para ellos hemos de comprobar que los errores a lo largo del rango de la serie tanto en entrenamiento como en test son normales, es decir, que se distribuyen mediante distribución normal a lo largo de todo el tiempo.
 
 Aplicamos el test de normalidad de Jarque Bera para comprobar la normalidad en los errores tanto en los residuos del entrenamiento como en los del test, calculados como la tendencia estimada en test menos la serie temporal.
 
@@ -100,7 +105,7 @@ JB.tr
 JB.ts
 ```
 
-Asumiendo confianza del 95% podemos asumir que no hay diferencia significativa de los datos de error con respecto a los de una distribución normal ni en train ni en test (ya que ambos p-value son mayores a 0.05).\\
+Asumiendo confianza del 95% podemos asumir que no hay diferencia significativa de los datos de error con respecto a los de una distribución normal ni en train ni en test (ya que ambos p-value son mayores a 0.05).
 
 Comparamos las medias de error para comprobar si el error producido en la parte de train es equivalente al producido en la parte de test. Aplicamos el Test de Student para comparar dos distribuciones de datos diferentes (mediante sus medias).
 ```{r}
@@ -123,8 +128,10 @@ lines(tiempoTs, serieTs.SinTend, col="red")
 Una vez eliminda la tendencia quitamos la estacionalidad. Usamos para ello la funcion decompose
 ```{r}
 k = 12 # aquí guardamos los datos estacionales
-estacionalidad = decompose(serie.ts.log)$seasonal[1:k] # tal como dijimos antes usamos el atributo seasonal
-                                                       # para calcular los k=12 valores de estacionalidad
+estacionalidad = decompose(serie.ts.log)$seasonal[1:k] # tal como dijimos antes usamos 
+                                                       # el atributo seasonal
+                                                       # para calcular los k=12 valores
+                                                       # de estacionalidad
                                                        # que se van repitiendo en la estacionalidad
 ```
 
@@ -156,7 +163,8 @@ ADFTr
 
 Con un nivel de confianza del 95% no podemos asegurar que la serie sea estacionaria. Lo normal es no sea estacionario en media, es decir, que la media a lo largo del tiempo varie. Debemos hacer la serie estacionaria, por lo que vamos a diferenciarla.
 ```{r}
-serieTr.SinTend.SinEst.Diff = diff(serieTr.SinTend.SinEst) # diferenciación en una unidad de la serie anterior
+serieTr.SinTend.SinEst.Diff = diff(serieTr.SinTend.SinEst) # diferenciación en una unidad 
+                                                           # de la serie anterior
 serieTs.SinTend.SinEst.Diff = diff(serieTs.SinTend.SinEst)
 
 # le pasamos el test de nuevo para comprobar si es estacionaria
@@ -199,13 +207,66 @@ errorTr
 errorTs
 ```
 
+Comprobamos de forma visual el modelo incluyendo la serie sin tendencia ni estacionalidad
+```{r}
+plot.ts(serieTr.SinTend.SinEst, xlim=c(1, tiempoTs[length(tiempoTs)]))
+lines(valoresReconstruidos, col="blue")
+lines(tiempoTs,serieTs.SinTend.SinEst, col="red")
+lines(tiempoTs,valoresPredichos, col="green")
+```
+
+La reconstrucción para el train es razonablemente fiel, sin embargo para el test no, posiblemente debido a que, al observar acf y pacf, podemos ver que los instantes distintos al actual están muy cercanos a los límites, por lo que quizás no sean lo suficientemente importantes para calcular el valor en el instante actual. Podemos decir que nuestra serie es prácticamente ruido blanco, por ello nos aparece la predicción verde observada en la gráfica. Finalmente comprobamos la validez del modelo (sus errores) mediante tests estadisticos. Para ello aplicamos varios:
 
 
+Test de Box-Pierce: comprobamos que los residuos que nos quedan son aleatorios
+```{r}
+BTtest = Box.test(modelo$residuals)
+BTtest
+```
+
+Con una confianza del 95% no podemos pensar que los residuos no sean valores aleatorios, por tanto pasa el test determinando que sí, siguen una distribución aleatoria. Si no fuesen aleatorios significaría que nuestro modelo no se ajustaría a todas las características de la señal, por lo que sería un modelo incorrecto. En este caso es válido con respecto al valor de los residuos.
 
 
+Jarque Bera: vemos si los residuos, aunque aleatorios, son normales (media cero y desviación típica la que sea).
+```{r}
+JBt = jarque.bera.test(modelo$residuals)
+JBt
+```
 
 
+Saphiro-Wilk: mismo cometido que Jarque Bera
+```{r}
+swt = shapiro.test(modelo$residuals)
+swt
+```
 
+Asumimos en ambos la normalidad de los residuos con el resultado de los p-value obtenidos, ya que la hipótesis nula propone que los datos no siguen una distribución normal.
+
+A continuación mostramos un histograma y función de densidad para obtener resultados gráficos de confirmación.
+```{r}
+hist(modelo$residuals, col="blue", prob=TRUE, ylim=c(0,20), xlim=c(-0.2,0.2))
+lines(density(modelo$residuals))
+```
+
+
+Con estas comprobaciones el modelo queda validado, ya que los errores que nos dan son aleatorios que provienen de una distribución normal. A continuación hemos de deshacer los cambios para comprobar la predicción con el conjunto de datos de test. Procedemos a ello:
+```{r}
+# Incluimos la estacionalidad
+valoresReconstruidos.Est = valoresReconstruidos + aux
+valoresPredichos.Est = valoresPredichos + estacionalidad
+
+# Incluimos la tendencia
+valoresReconstruidos.Est.Tend = valoresReconstruidos.Est + tendEstimadaTr
+valoresPredichos.Est.Tend = valoresPredichos.Est + tendEstimadaTs
+
+# Transformación de los logaritmos
+valoresReconstruidos.Est.Tend.exp = exp(valoresReconstruidos.Est.Tend)
+valoresPredichos.Est.Tend.exp = exp(valoresPredichos.Est.Tend)
+
+plot.ts(serie)
+lines(tiempoTr, valoresReconstruidos.Est.Tend.exp, col = "blue")
+lines(tiempoTs, valoresPredichos.Est.Tend.exp, col = "green")
+```
 
 
 
