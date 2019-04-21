@@ -1,0 +1,15 @@
+---
+title: "practicaGuiada"
+output: pdf_document
+---
+
+```{r}
+library(tseries)
+```
+
+Leemos 
+```{r}
+
+```
+
+
