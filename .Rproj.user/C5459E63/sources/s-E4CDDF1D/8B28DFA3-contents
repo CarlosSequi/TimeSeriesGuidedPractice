@@ -104,7 +104,19 @@ Asumiendo confianza del 95% podemos asumir que no hay diferencia significativa d
 
 Comparamos las medias de error para comprobar si el error producido en la parte de train es equivalente al producido en la parte de test. Aplicamos el Test de Student para comparar dos distribuciones de datos diferentes (mediante sus medias).
 ```{r}
+TT = t.test(c(parametros.H1$residuals, tendEstimadaTs-serieTs))
+TT
+```
 
+El p-value nos indica que esta distribución de errores es de media cero (casi: 0.007), y que no hay una desviación significativa con respecto a esta media, por tanto ambos errores de test y entrenamiento tienen la misma media y el modelo lineal es válido, por lo que la tendencia calculada es correcta. Procedemos por tanto a eliminar la tendencia de las series iniciales de entrenamiento y test.
+
+```{r}
+serieTr.SinTend = serieTr - tendEstimadaTr
+serieTs.SinTend = serieTs - tendEstimadaTs
+
+# comprobamos como queda:
+plot.ts(serieTr.SinTend, xlim=c(1, tiempoTs[length(tiempoTs)]))
+lines(tiempoTs, serieTs.SinTend, col="red")
 ```
 
 

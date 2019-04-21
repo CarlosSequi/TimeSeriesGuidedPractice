@@ -88,9 +88,36 @@ lines(tiempoTs, tendEstimadaTs, col = "green")
 ```
 
 
+Validamos a continuación de forma estadística que el modelo lineal creado sea correcto. Para ellos hemos de comprobar que los errores a lo largo del rango de la serie tanto en entrenamiento como en test son normales, es decir, que se distribuyen mediante distribución normal a lo largo de todo el tiempo.\\
+
+Aplicamos el test de normalidad de Jarque Bera para comprobar la normalidad en los errores tanto en los residuos del entrenamiento como en los del test, calculados como la tendencia estimada en test menos la serie temporal.
 
 
+```{r}
+JB.tr = jarque.bera.test(parametros.H1$residuals)
+JB.ts = jarque.bera.test(tendEstimadaTs-serieTs)
+JB.tr
+JB.ts
+```
 
+Asumiendo confianza del 95% podemos asumir que no hay diferencia significativa de los datos de error con respecto a los de una distribución normal ni en train ni en test (ya que ambos p-value son mayores a 0.05).\\
+
+Comparamos las medias de error para comprobar si el error producido en la parte de train es equivalente al producido en la parte de test. Aplicamos el Test de Student para comparar dos distribuciones de datos diferentes (mediante sus medias).
+```{r}
+TT = t.test(c(parametros.H1$residuals, tendEstimadaTs-serieTs))
+TT
+```
+
+El p-value nos indica que esta distribución de errores es de media cero (casi: 0.007), y que no hay una desviación significativa con respecto a esta media, por tanto ambos errores de test y entrenamiento tienen la misma media y el modelo lineal es válido, por lo que la tendencia calculada es correcta. Procedemos por tanto a eliminar la tendencia de las series iniciales de entrenamiento y test.
+
+```{r}
+serieTr.SinTend = serieTr - tendEstimadaTr
+serieTs.SinTend = serieTs - tendEstimadaTs
+
+# comprobamos como queda:
+plot.ts(serieTr.SinTend, xlim=c(1, tiempoTs[length(tiempoTs)]))
+lines(tiempoTs, serieTs.SinTend, col="red")
+```
 
 
 

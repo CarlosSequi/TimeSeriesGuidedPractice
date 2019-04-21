@@ -1,0 +1,4 @@
+"0","serieTr.SinTend = serieTr - tendEstimadaTr"
+"0","serieTs.SinTend = serieTs - tendEstimadaTs"
+"0","# comprobamos como queda:"
+"0","plot.ts(serieTr.SinTend, xlim=c(1, tiempoTs[length(tiempoTs)]))"
