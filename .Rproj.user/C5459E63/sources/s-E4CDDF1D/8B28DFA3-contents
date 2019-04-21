@@ -147,14 +147,14 @@ Comprobamos si la serie es estacionaria o no con el test ACF
 acf(serieTr.SinTend.SinEst)
 ```
 
-No llega a ser un resultado visualmente aclaratorio para determinar si posee o no estacionariedad, por tanto procedemos a aplicar un test de Dickey-Fuller aumentado para asegurarnos.
+No llega a ser un resultado visualmente aclaratorio para determinar si posee o no estacionariedad debido a que posee una bajada muy suave entre instantes de tiempo, por tanto procedemos a aplicar un test de Dickey-Fuller aumentado para asegurarnos.
 
 ```{r}
 ADFTr = adf.test(serieTr.SinTend.SinEst)
 ADFTr
 ```
 
-Con un nivel de confianza del 95% podemos afirmar que la serie no es estacionaria. Lo normal es no sea estacionario en media, es decir, que la media a lo largo del tiempo varie. Debemos hacer la serie estacionaria, por lo que vamos a diferenciarla.
+Con un nivel de confianza del 95% no podemos asegurar que la serie sea estacionaria. Lo normal es no sea estacionario en media, es decir, que la media a lo largo del tiempo varie. Debemos hacer la serie estacionaria, por lo que vamos a diferenciarla.
 ```{r}
 serieTr.SinTend.SinEst.Diff = diff(serieTr.SinTend.SinEst) # diferenciación en una unidad de la serie anterior
 serieTs.SinTend.SinEst.Diff = diff(serieTs.SinTend.SinEst)
@@ -170,10 +170,34 @@ Lo comprobamos también de forma visual:
 acf(serieTr.SinTend.SinEst.Diff)
 ```
 
+Observamos la existencia de estacionaridad con la gran bajada entre los instantes 0 y 1.
 
+Observamos el acf parcial para ver como influyen de forma individual cada uno de los instantes de tiempo sobre
+el instante actual.
+```{r}
+pacf(serieTr.SinTend.SinEst.Diff)
+```
 
+Podemos pensar que estas gráficas de acf y pacf son típicos de un modelo autoregresivo de grado 4 (el último instante donde la línea pasa el umbral en pacf). Por ello deberíamos poder modelar el sistema mediante un modelo autoregresivo de orden 4. Podemos usar para ello un modelo ARIMA con una diferenciación. Entrenamos dicho modelo a continuación.
+```{r}
+# calculamos el modelo
+# la diferenciación la introducimos dentro del modelo, por tanto usamos serieTr.SinTend.SinEst
+modelo = arima(serieTr.SinTend.SinEst, order = c(4,1,0)) # 0 indica que no es de medias moviles
+# vemos los residuos del modelo, que al ser un modelo autoregresivo lo calculamos como residuos+serie
+valoresReconstruidos = serieTr.SinTend.SinEst + modelo$residuals # valores reconstruidos de la serie
+                                                                 # con el modelo que tenemos
 
+# calculamos las predicciones
+predicciones = predict(modelo, n.ahead = NPred)
+valoresPredichos = predicciones$pred
+valoresPredichos
 
+# calculamos el error cuadrático acumulado del ajuste en ajuste y test
+errorTr = sum((modelo$residuals)^2)
+errorTs = sum((valoresPredichos - serieTs.SinTend.SinEst) ^2)
+errorTr
+errorTs
+```
 
 
 
