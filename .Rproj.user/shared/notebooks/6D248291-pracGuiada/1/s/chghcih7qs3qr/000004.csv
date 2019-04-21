@@ -1,0 +1,6 @@
+"0","serieTr = serie.log[1:(length(serie.log)-NTest)] # tomamos todos los valores de la serie"
+"0","                                                 # como train excepto los 12 últimos"
+"0","tiempoTr = 1:length(serieTr) # instantes de tiempo de esta serie train"
+"0","# mismo proceso para la serie de test..."
+"0","serieTs = serie.log[(length(serie.log)-NTest+1):length(serie)]"
+"0","tiempoTs = (tiempoTr[length(tiempoTr)]+1):(tiempoTr[length(tiempoTr)]+NTest)"

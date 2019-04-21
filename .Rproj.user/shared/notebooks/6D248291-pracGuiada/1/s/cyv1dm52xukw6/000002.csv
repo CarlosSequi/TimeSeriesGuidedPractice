@@ -1,0 +1,21 @@
+"0","parametros.H1 = lm(serieTr ~tiempoTr)"
+"0","parametros.H1"
+"1","
+Call:
+"
+"1","lm(formula = serieTr ~ tiempoTr)"
+"1","
+
+"
+"1","Coefficients:
+"
+"1","(Intercept)  "
+"1","   tiempoTr  "
+"1","
+"
+"1","    4.79025  "
+"1","    0.01058  "
+"1","
+"
+"1","
+"

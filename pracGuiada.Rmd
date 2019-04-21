@@ -2,39 +2,129 @@
 title: "practicaGuiada"
 output: pdf_document
 ---
-ACF: cuanto contribuyen todos los resultados obtenidos en la serie en los anteriores instantes para el calculo del valor actual de la serie
-ACF PARCIAL(PACF): nos dice cuanto contribuye cada uno de los instantes anteriores en el calculo del valor actual de la serie
 
--un acf con una tendencia descendente leve seguramente no sera estacionaria.
--cuando hay estacionalidad clara, el acf saldra como en ''olas''. El primer pico de la serie nos da la frecuencia de repeticion. Si el pico esta en 10, significa que el valor t-10 me aporta el que mas para predecir el valor actual t.
--los ciclos no se repiten cada cierto tiempo como la estacionalidad. La estacionalidad buscaremos como quitarla siempre.
--si sabemos que una serie tiene estacionalidad, PACF no nos va a dar mucha informacion.
--test dicky fuller nos puede decir que hay estacionalidad, pero hemos de corroborarlo con el ACF.
--todo lo que este por debajo de los umbrales no es necesario tenerlo en cuenta.
--buscamos series estacionarias, no estacionales y sin tendencia.
--la estimacion de una tendencia puede ser mediante cualquier funcion matematica (lineal, cuadratica, exponencial...). Si no encontramos ninguna funcion matematica para modelar la tendencia, recurrimos a diferenciar las veces que sea necesarias para suavizar dicha tendencia.
--con el filtrado eliminamos el ruido de la serie, una vez hecho esto ya aplicamos regresion lineal o el modelo que sea para calcular la tendencia.
--cuanto mas rapido reduzca la pendiente del ACF, más estacionaria sera. En la transparencia donde se ve el resultado de ACF con filtrado, ACF baja del tiron, lo que nos hace pensar que ya puede ser estacionaria, para salir de dudas aplicamos el test dickie fuller.
--Cuando no hay tendencia tendremos normalmente media = 0 (o proxima).
--una vez le hemos quitado a la serie temporal la tendencia y la estacionalidad nos queda la componente irregular, que es lo que modelaremos con ARIMA. Necesitamos que la componente orregular que queda sea estacionaria, para ello, si no lo es, solo nos queda realizar diferenciacion hasta que el test nos diga que es estacionaria.
--si tengo que hacer una diferenciacion para hacer la serie estacionaria, para reconstruir la serie despues de aplicar el modelo habrá que integrar (lo contrario de diferenciar). Para indicarle a ARIMA que hemos aplicado 1 diferenciacion, hacemos ARIMA(x,1,y) donde y es para indicar los coeficientes de media movil y x es para indicar los coeficientes de autoregresion.
--al llamar a arima le pasamos "serie", que es la componente irregular que queremos modelar. Mas tarde habra que añadir la tendencia y la estacionalidad que hemos quitado para poder llegar hasta aqui.
--para saber la cantidad de coeficientes autoregresivos (el orden del modelo autoregresivo) miro en el PACF el ultimo instante donde la linea pasa el umbral. Ese instante es el numero que hay que usar (el instante, no la cantidad de lineas que sobrepasan el umbral)
--como test bis qyedanis siempre con los ultimos valores de la serie
--para saber la cantidad de medias moviles miramos en ACF en que indice esta el ultimo valor por encima de los umbrales
--hay reglas para saber si un modelo es autoregresivo o de medias moviles, pero no hay regla para saber si es autoregresivo Y de medias moviles, por tanto tendremos que probar.
--si vemos un "arbol de navidad tumbado", una linealidad en descenso o valores alternando en ACF, seguramente sea autoregresivo, si vemos eso en PACF, sera de media moviles.
--como seleccionar el mejor modelo
-  -RMSE (problema si sobreajusta el modelo)
-  -usaremos el criterio de Akaike (AIC).Grados de libertad = parametros del modelo. Nos quedamos con el mas pequeño, ya que cuanto más grande sea peor es el modelo.
-  -a parte del valor akaike necesitamos que el modelo ajuste bien.
+
+Cargamos la biblioteca para series temporales.
 ```{r}
 library(tseries)
 ```
 
-Leemos 
+Leemos los datos de la serie
 ```{r}
-
+serie = scan("pasajeros_1949_1959.dat")
 ```
+
+Dividimos los datos en entrenamiento y test. Dejamos para ello el último año para la comprobación de la validez del modelo, y el resto lo usamos como train.
+```{r}
+NTest = 12 # cantidad de datos a usar como test
+NPred = 12 # cantidad de predicciones que queremos realizar 
+serie.ts = ts(serie, frequency = 12) # creamos el objeto serie temporal suponiendo una estacionalidad de 12 meses
+plot(decompose(serie.ts))
+```
+
+Observamos aquí: \\
+-observed: los valores de la serie\\
+-trend: la tendencia calculada mediante filtros\\
+-seasonal: estacionalidad en la que cada 12 instantes de tiempo se repite la serie\\
+-random: lo que queda de la serie una vez eliminadas tendencia y estacionalidad\\
+
+Como observamos en random, la varianza es alta, lo que puede dar problemas en un futuro para la estacionariedad,
+ya que como sabemos, una serie con estacionariedad no varía en media ni en varianza. Para ello, a la serie inicial
+le calculamos el logaritmo de la serie (calculamos el logaritmo tanto a los datos como a la serie temporal):
+```{r}
+serie.ts.log = log(serie.ts)
+serie.log = log(serie)
+plot(decompose(serie.ts.log))
+```
+
+Como observamos ahora, la varianza consta de menor variación a lo largo del tiempo, lo que en un futuro provocará que no tengamos problemas a la hora de calcular la estacionariedad.
+
+Aplicando decompose sobre los datos podemos observar como los valores de cada mes en el atributo seasonal son exactamente los mismos, lo que nos hará falta para calcular la componente estacional y restarselo a la serie.
+```{r}
+decompose(serie.ts.log)
+```
+
+
+Procedemos a la división de los datos en train y test
+```{r}
+serieTr = serie.log[1:(length(serie.log)-NTest)] # tomamos todos los valores de la serie
+                                                 # como train excepto los 12 últimos
+tiempoTr = 1:length(serieTr) # instantes de tiempo de esta serie train
+
+# mismo proceso para la serie de test...
+serieTs = serie.log[(length(serie.log)-NTest+1):length(serie)]
+tiempoTs = (tiempoTr[length(tiempoTr)]+1):(tiempoTr[length(tiempoTr)]+NTest)
+```
+
+
+Representamos la serie de entrenamiento y la linea de la serie de test en rojo con los parametros necesarios para que salga de forma correcta dentro de los límites de la gráfica y en el lugar adecuado.
+```{r}
+plot.ts(serieTr, xlim=c(1, tiempoTs[length(tiempoTs)]))
+lines(tiempoTs, serieTs, col="red")
+```
+
+
+A continuación prodecemos a modelar la tendencia. 
+Parece ser que la tendencia es lineal y creciente, por lo que tendrá la forma de:\\
+serie = parametroA*tiempo + parametroB.\\
+Con la funcion lm calculamos esos dos parametros para modelar dicha tendencia.
+```{r}
+parametros.H1 = lm(serieTr ~tiempoTr)
+parametros.H1
+```
+
+Intercept es el termino independiente (parametroB) y el otro es el que multiplica al tiempo para poder calcular la serie (parametroA). Para modelar la tendencia usamos la fórmula descrita antes:
+```{r}
+tendEstimadaTr = parametros.H1$coefficients[1] + tiempoTr*parametros.H1$coefficients[2] # tendencia en entrenamiento
+tendEstimadaTs = parametros.H1$coefficients[1] + tiempoTs*parametros.H1$coefficients[2] # tendencia en test
+```
+
+Comprobamos de forma visual si la tendencia se ajusta al modelo que tenemos de la serie temporal.
+```{r}
+plot.ts(serieTr, xlim=c(1, tiempoTs[length(tiempoTs)]))
+lines(tiempoTs, serieTs, col="red")
+lines(tiempoTr, tendEstimadaTr, col = "blue")
+lines(tiempoTs, tendEstimadaTs, col = "green")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
