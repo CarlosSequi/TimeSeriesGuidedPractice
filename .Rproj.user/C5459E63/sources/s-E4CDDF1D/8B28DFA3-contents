@@ -120,11 +120,55 @@ lines(tiempoTs, serieTs.SinTend, col="red")
 ```
 
 
+Una vez eliminda la tendencia quitamos la estacionalidad. Usamos para ello la funcion decompose
+```{r}
+k = 12 # aquí guardamos los datos estacionales
+estacionalidad = decompose(serie.ts.log)$seasonal[1:k] # tal como dijimos antes usamos el atributo seasonal
+                                                       # para calcular los k=12 valores de estacionalidad
+                                                       # que se van repitiendo en la estacionalidad
+```
 
+Ahora mismo tenemos una serie sin tendencia con 120 valores (train) y una estacionalidad con 12 valores. A esta serie sin tendencia hemos de restarle la estacionalidad de 12 en 12 valores (serie[1:12] - estacionalidad, serie[13:25] - estacionalidad ...).
+```{r}
+# repetimos la estacionalidad para ello, tantas veces como valores haya en la serie
+aux = rep(estacionalidad, length(serieTr.SinTend)/length(estacionalidad))
+# quitamos la estacionalidad a train y test
+serieTr.SinTend.SinEst = serieTr.SinTend - aux
+serieTs.SinTend.SinEst = serieTs.SinTend - estacionalidad # no usamos aux porque estacionalidad 
+                                                          # tiene la misma cantidad de valores que
+                                                          # serieTs.SinTend
+# comprobamos como queda:
+plot.ts(serieTr.SinTend.SinEst, xlim=c(1, tiempoTs[length(tiempoTs)]))
+lines(tiempoTs, serieTs.SinTend.SinEst, col="red")
+```
 
+Comprobamos si la serie es estacionaria o no con el test ACF
+```{r}
+acf(serieTr.SinTend.SinEst)
+```
 
+No llega a ser un resultado visualmente aclaratorio para determinar si posee o no estacionariedad, por tanto procedemos a aplicar un test de Dickey-Fuller aumentado para asegurarnos.
 
+```{r}
+ADFTr = adf.test(serieTr.SinTend.SinEst)
+ADFTr
+```
 
+Con un nivel de confianza del 95% podemos afirmar que la serie no es estacionaria. Lo normal es no sea estacionario en media, es decir, que la media a lo largo del tiempo varie. Debemos hacer la serie estacionaria, por lo que vamos a diferenciarla.
+```{r}
+serieTr.SinTend.SinEst.Diff = diff(serieTr.SinTend.SinEst) # diferenciación en una unidad de la serie anterior
+serieTs.SinTend.SinEst.Diff = diff(serieTs.SinTend.SinEst)
+
+# le pasamos el test de nuevo para comprobar si es estacionaria
+ADFTr2 = adf.test(serieTr.SinTend.SinEst.Diff)
+ADFTr2
+```
+
+Al ser p-value < 0.05 podemos asumir que ya sí es estacionaria.
+Lo comprobamos también de forma visual:
+```{r}
+acf(serieTr.SinTend.SinEst.Diff)
+```
 
 
 

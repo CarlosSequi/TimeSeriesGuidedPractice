@@ -5,7 +5,7 @@ ACF PARCIAL(PACF): nos dice cuanto contribuye cada uno de los instantes anterior
 -cuando hay estacionalidad clara, el acf saldra como en ''olas''. El primer pico de la serie nos da la frecuencia de repeticion. Si el pico esta en 10, significa que el valor t-10 me aporta el que mas para predecir el valor actual t.
 -los ciclos no se repiten cada cierto tiempo como la estacionalidad. La estacionalidad buscaremos como quitarla siempre.
 -si sabemos que una serie tiene estacionalidad, PACF no nos va a dar mucha informacion.
--test dicky fuller nos puede decir que hay estacionalidad, pero hemos de corroborarlo con el ACF.
+-test dicky fuller nos puede decir que hay estacionaridad, pero hemos de corroborarlo con el ACF.
 -todo lo que este por debajo de los umbrales no es necesario tenerlo en cuenta.
 -buscamos series estacionarias, no estacionales y sin tendencia.
 -la estimacion de una tendencia puede ser mediante cualquier funcion matematica (lineal, cuadratica, exponencial...). Si no encontramos ninguna funcion matematica para modelar la tendencia, recurrimos a diferenciar las veces que sea necesarias para suavizar dicha tendencia.
