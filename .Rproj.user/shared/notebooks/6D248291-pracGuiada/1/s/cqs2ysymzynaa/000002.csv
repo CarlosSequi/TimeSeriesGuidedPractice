@@ -1,2 +1,4 @@
-"0","tendEstimadaTr = parametros.H1$coefficients[1] + tiempoTr*parametros.H1$coefficients[2] # tendencia en entrenamiento"
-"0","tendEstimadaTs = parametros.H1$coefficients[1] + tiempoTs*parametros.H1$coefficients[2] # tendencia en test"
+"0","# tendencia en entrenamiento"
+"0","tendEstimadaTr = parametros.H1$coefficients[1] + tiempoTr*parametros.H1$coefficients[2]"
+"0","# tendencia en test"
+"0","tendEstimadaTs = parametros.H1$coefficients[1] + tiempoTs*parametros.H1$coefficients[2] "

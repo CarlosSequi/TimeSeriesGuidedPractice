@@ -1,0 +1,5 @@
+"0","k = 12 # aquí guardamos los datos estacionales"
+"0","estacionalidad = decompose(serie.ts.log)$seasonal[1:k]"
+"0","aux = rep(estacionalidad, length(serie.SinTend)/length(estacionalidad))"
+"0","serie.SinTend.SinEst = serie.SinTend - aux"
+"0","plot.ts(serie.SinTend.SinEst, xlim=c(1, tiempo[length(tiempo)]))"

@@ -1,4 +1,0 @@
-"0","NTest = 12 # cantidad de datos a usar como test"
-"0","NPred = 12 # cantidad de predicciones que queremos realizar "
-"0","serie.ts = ts(serie, frequency = 12) # creamos el objeto serie temporal suponiendo una estacionalidad de 12 meses"
-"0","plot(decompose(serie.ts))"

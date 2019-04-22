@@ -16,7 +16,7 @@ ACF PARCIAL(PACF): nos dice cuanto contribuye cada uno de los instantes anterior
 -si tengo que hacer una diferenciacion para hacer la serie estacionaria, para reconstruir la serie despues de aplicar el modelo habrá que integrar (lo contrario de diferenciar). Para indicarle a ARIMA que hemos aplicado 1 diferenciacion, hacemos ARIMA(x,1,y) donde y es para indicar los coeficientes de media movil y x es para indicar los coeficientes de autoregresion.
 -al llamar a arima le pasamos "serie", que es la componente irregular que queremos modelar. Mas tarde habra que añadir la tendencia y la estacionalidad que hemos quitado para poder llegar hasta aqui.
 -para saber la cantidad de coeficientes autoregresivos (el orden del modelo autoregresivo) miro en el PACF el ultimo instante donde la linea pasa el umbral. Ese instante es el numero que hay que usar (el instante, no la cantidad de lineas que sobrepasan el umbral)
--como test bis qyedanis siempre con los ultimos valores de la serie
+-como test nos quedamos siempre con los ultimos valores de la serie
 -para saber la cantidad de medias moviles miramos en ACF en que indice esta el ultimo valor por encima de los umbrales
 -hay reglas para saber si un modelo es autoregresivo o de medias moviles, pero no hay regla para saber si es autoregresivo Y de medias moviles, por tanto tendremos que probar.
 -si vemos un "arbol de navidad tumbado", una linealidad en descenso o valores alternando en ACF, seguramente sea autoregresivo, si vemos eso en PACF, sera de media moviles.

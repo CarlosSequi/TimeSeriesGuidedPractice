@@ -1,0 +1,7 @@
+"0","parametros.H1 = lm(serieTr ~tiempo)"
+"0","# tendencia en entrenamiento"
+"0","tendEstimada = parametros.H1$coefficients[1] + tiempo*parametros.H1$coefficients[2]"
+"0","# tendencia en test"
+"0","tendEstimadaTs = parametros.H1$coefficients[1] + tiempoTs*parametros.H1$coefficients[2] "
+"0","serie.SinTend = serieTr - tendEstimada"
+"0","plot.ts(serie.SinTend, xlim=c(1, tiempo[length(tiempo)]))"

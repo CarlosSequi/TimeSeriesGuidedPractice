@@ -1,0 +1,3 @@
+"0","serieTr = serie.log # tomamos todos los valores de la serie"
+"0","tiempo = 1:length(serieTr) # instantes de tiempo de esta serie train"
+"0","tiempoTs =(length(tiempo)+1):(length(tiempo)+NPred)"

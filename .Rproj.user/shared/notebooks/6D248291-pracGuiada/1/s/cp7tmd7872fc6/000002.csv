@@ -1,4 +1,5 @@
-"0","serieTr.SinTend.SinEst.Diff = diff(serieTr.SinTend.SinEst) # diferenciación en una unidad de la serie anterior"
+"0","serieTr.SinTend.SinEst.Diff = diff(serieTr.SinTend.SinEst) # diferenciación en una unidad "
+"0","                                                           # de la serie anterior"
 "0","serieTs.SinTend.SinEst.Diff = diff(serieTs.SinTend.SinEst)"
 "0","# le pasamos el test de nuevo para comprobar si es estacionaria"
 "0","ADFTr2 = adf.test(serieTr.SinTend.SinEst.Diff)"

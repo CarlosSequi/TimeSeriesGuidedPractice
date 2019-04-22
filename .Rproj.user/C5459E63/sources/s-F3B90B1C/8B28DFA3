@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1555859726964.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3044622576",
+    "id" : "8B28DFA3",
+    "lastKnownWriteTime" : 1555950779,
+    "last_content_update" : 1555950779509,
+    "path" : "E:/ETSIIT/MÁSTER/Series temporales y mineria de flujos de datos/practicas series temporales/practica guiada/TimeSeriesGuidedPractice/pracGuiada.Rmd",
+    "project_path" : "pracGuiada.Rmd",
+    "properties" : {
+        "cursorPosition" : "309,93",
+        "scrollLine" : "305"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
